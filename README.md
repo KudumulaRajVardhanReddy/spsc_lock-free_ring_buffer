@@ -1,6 +1,6 @@
 # High-Performance Lock-Free SPSC Ring Buffer
 
-A header-only, high-performance **Single-Producer Single-Consumer (SPSC)** lock-free ring buffer implemented in modern C++17. Optimized for low-latency, real-time systems, trade-execution platforms, and audio processing pipelines.
+A header-only, high-performance **Single-Producer Single-Consumer (SPSC)** lock-free ring buffer implemented in modern C++17.
 
 ---
 
