@@ -14,6 +14,8 @@ include_directories(include benchmarks)
 
 include(FetchContent)
 
+set(CMAKE_TLS_VERIFY OFF)
+
 FetchContent_Declare(
     googletest
     URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
@@ -26,6 +28,7 @@ FetchContent_Declare(
     URL https://github.com/google/benchmark/archive/refs/tags/v1.8.3.zip
 )
 set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+set(BENCHMARK_ENABLE_WERROR OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googlebenchmark)
 
 enable_testing()
