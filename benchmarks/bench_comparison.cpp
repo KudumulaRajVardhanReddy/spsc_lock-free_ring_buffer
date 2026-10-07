@@ -10,7 +10,7 @@ constexpr size_t kCapacity = 1024;
 
 //Benchmarks for Standard Mutex Queue
 static void BM_StandardMutexQueue(benchmark::State& state) {
-    StandardMutexQueue<size_t> queue;
+    StandardMutexQueue<size_t, kCapacity> queue;
     const size_t num_items = state.range(0);
 
     for (auto _ : state) {
