@@ -49,23 +49,6 @@ Evaluated on x86_64 architecture using Google Benchmark (1,000,000 operations pe
 
 ---
 
-## Project Structure
-
-```
-spsc_ring_buffer/
-├── include/
-│   └── spsc_ring_buffer.hpp      # Primary header-only implementation
-├── tests/
-│   └── test_ring_buffer.cpp      # Unit tests (GoogleTest)
-├── benchmarks/
-│   ├── bench_comparison.cpp      # Google Benchmark suite
-│   └── release.json              # Captured benchmark data
-├── CMakeLists.txt                 # Build configuration
-└── README.md
-```
-
----
-
 ## Requirements & Building
 
 ### Prerequisites
