@@ -60,8 +60,8 @@ Evaluated on x86_64 architecture using Google Benchmark (1,000,000 operations pe
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/KudumulaRajVardhanReddy/spsc_lock-free_ring_buffer.git]
-   cd spsc_ring_buffer
+   git clone https://github.com/KudumulaRajVardhanReddy/spsc_lock-free_ring_buffer.git
+   cd spsc_lock-free_ring_buffer
    ```
 
 2. **Configure with CMake (Release Mode):**
@@ -83,48 +83,3 @@ Evaluated on x86_64 architecture using Google Benchmark (1,000,000 operations pe
    ```bash
    ./build/bench_comparison
    ```
-
----
-
-## Usage Example
-
-```cpp
-#include "spsc_ring_buffer.hpp"
-#include <iostream>
-#include <thread>
-
-int main() {
-    // Capacity must be a power of 2
-    constexpr size_t Capacity = 1024;
-    SPSCRingBuffer<int, Capacity> ring_buffer;
-
-    // Producer Thread
-    std::thread producer([&]() {
-        for (int i = 0; i < 100; ++i) {
-            while (!ring_buffer.push(i)) {
-                // Buffer full: yield or spin
-                std::this_thread::yield();
-            }
-        }
-    });
-
-    // Consumer Thread
-    std::thread consumer([&]() {
-        int val = 0;
-        for (int i = 0; i < 100; ++i) {
-            while (!ring_buffer.pop(val)) {
-                // Buffer empty: yield or spin
-                std::this_thread::yield();
-            }
-            std::cout << "Received: " << val << "\n";
-        }
-    });
-
-    producer.join();
-    consumer.join();
-
-    return 0;
-}
-```
-
----
