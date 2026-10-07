@@ -1,4 +1,4 @@
-//benchmarking - Performance Comparison
+//Benchmarking - Performance Comparison
 
 #include <benchmark/benchmark.h>
 #include <thread>
