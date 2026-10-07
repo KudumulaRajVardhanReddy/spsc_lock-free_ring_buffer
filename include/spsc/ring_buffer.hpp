@@ -9,7 +9,7 @@
 
 template<typename T, size_t Capacity>
 class SPSCRingBuffer {
-    static_assert(Capacity & (Capacity - 1) == 0 && Capacity > 0, "Capacity must be a power of 2.");
+    static_assert((Capacity & (Capacity - 1)) == 0 && Capacity > 0, "Capacity must be a power of 2.");
 
 public:
     SPSCRingBuffer() : write_index_(0), read_index_(0) {}
