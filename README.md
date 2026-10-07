@@ -60,7 +60,7 @@ Evaluated on x86_64 architecture using Google Benchmark (1,000,000 operations pe
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/spsc_ring_buffer.git
+   git clone [https://github.com/KudumulaRajVardhanReddy/spsc_lock-free_ring_buffer.git]
    cd spsc_ring_buffer
    ```
 
