@@ -39,11 +39,15 @@ To eliminate false sharing, the internal memory layout isolates thread-specific 
 
 Evaluated on x86_64 architecture using Google Benchmark (1,000,000 operations per iteration in Release build `-O3`):
 
-| Implementation | Execution Time | Throughput (Items/sec) | Speedup vs. Baseline |
+| Implementation | Execution Time | Throughput (Ops/sec) | Speedup vs. Baseline |
 | :--- | :--- | :--- | :--- |
-| **`std::mutex` + Queue** | ~55.40 ms | 12.80 G/s | Baseline |
-| **Atomic SPSC (No `alignas`)** | ~1.80 ms | 45.51 G/s | ~30.7x faster |
-| **Cache-Aligned SPSCRingBuffer** | **~2.68 ms** | **42.66 G/s** | **~20x-30x lock-free throughput** |
+| **`std::mutex` + Queue** | ~55.40 ms | ~18.05 M ops/sec | Baseline |
+| **Atomic SPSC (No `alignas`)** | ~1.80 ms | ~555.55 M ops/sec | ~30.7x |
+| **Cache-Aligned SPSCRingBuffer** | **~2.68 ms** | **~373.13 M ops/sec** | **~20.6x** |
+
+> **Why is unaligned slightly faster in this microbenchmark?**
+> In isolated synthetic tests without outer application work, unaligned atomic indices share a single L1 cache line, allowing tight-loop execution on hot hardware prefetchers. 
+> However, `alignas(64)` is used in production to enforce strict cache-line isolation. This prevents **false sharing** (cache-line bouncing) when producer and consumer threads run concurrently alongside real application workloads on separate CPU cores.
 
 > *Note: Raw Google Benchmark metrics are captured in `benchmarks/release.json`.*
 
