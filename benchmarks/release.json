@@ -1,0 +1,84 @@
+{
+  "context": {
+    "date": "2026-10-07T11:30:03-00:00",
+    "host_name": "PREDATOR",
+    "executable": "C:\\Mine\\CodeBase\\Repos\\spsc_ring_buffer\\build\\bench_comparison.exe",
+    "num_cpus": 32,
+    "mhz_per_cpu": 2419,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 49152,
+        "num_sharing": 2
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 2097152,
+        "num_sharing": 2
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 37748736,
+        "num_sharing": 32
+      }
+    ],
+    "load_avg": [],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "BM_StandardMutexQueue/1000000",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "BM_StandardMutexQueue/1000000",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 100,
+      "real_time": 5.5352566000074148e+01,
+      "cpu_time": 1.5625000000000000e-01,
+      "time_unit": "ms",
+      "items_per_second": 1.2800000000000000e+10
+    },
+    {
+      "name": "BM_AtomicSPSCNoAlignas/1000000",
+      "family_index": 1,
+      "per_family_instance_index": 0,
+      "run_name": "BM_AtomicSPSCNoAlignas/1000000",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 7467,
+      "real_time": 1.7970700013353120e+00,
+      "cpu_time": 4.3943350743270389e-02,
+      "time_unit": "ms",
+      "items_per_second": 4.5513142857142860e+10
+    },
+    {
+      "name": "BM_SPSCRingBuffer/1000000",
+      "family_index": 2,
+      "per_family_instance_index": 0,
+      "run_name": "BM_SPSCRingBuffer/1000000",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1000,
+      "real_time": 2.6836892000283115e+00,
+      "cpu_time": 4.6875000000000000e-02,
+      "time_unit": "ms",
+      "items_per_second": 4.2666666666666664e+10
+    }
+  ]
+}

@@ -8,7 +8,7 @@
 
 template<typename T, size_t Capacity>
 class AtomicSPSCNoAlignas {
-    static_assert(Capacity & (Capacity - 1) == 0 && Capacity > 0, "Capacity must be a power of 2.");
+    static_assert(((Capacity & (Capacity - 1)) == 0) && Capacity > 0, "Capacity must be a power of 2.");
 public:
 
     AtomicSPSCNoAlignas() : write_index_(0), read_index_(0) {}
@@ -17,7 +17,7 @@ public:
         const size_t current_write = write_index_.load(std::memory_order_relaxed);
         const size_t current_read = read_index_.load(std::memory_order_acquire);
 
-        if ((current_write + 1) & kMask == current_read) return false;
+        if (((current_write + 1) & kMask) == current_read) return false;
 
         buffer_[current_write & kMask] = item;
         write_index_.store(current_write + 1, std::memory_order_release);

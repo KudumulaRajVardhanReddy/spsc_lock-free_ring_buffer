@@ -13,7 +13,7 @@ public:
     bool push(const T& item) {
         std::lock_guard<std::mutex> lock(mutex_);
 
-        if (queue_.size >= Capacity) return false;
+        if (queue_.size() >= Capacity) return false;
 
         queue_.push(item);
         return true;

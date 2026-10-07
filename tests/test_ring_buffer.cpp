@@ -1,4 +1,4 @@
-//test_ring
+//test_ring_buffer
 
 #include <gtest/gtest.h>
 #include <thread>
@@ -12,14 +12,15 @@ TEST(SPSCRingBufferTest, SingleThreadBasicOps) {
     EXPECT_TRUE(buffer.push(10));
     EXPECT_TRUE(buffer.push(20));
     EXPECT_TRUE(buffer.push(30));
+    EXPECT_TRUE(buffer.push(40));
 
-    EXPECT_FALSE(buffer.push(40));
+    EXPECT_FALSE(buffer.push(50));
 
     auto val1 = buffer.pop();
     ASSERT_TRUE(val1.has_value());
     EXPECT_EQ(*val1, 10);
 
-    EXPECT_TRUE(buffer.push(40));
+    EXPECT_TRUE(buffer.push(50));
 
     auto val2 = buffer.pop();
     ASSERT_TRUE(val2.has_value());
@@ -32,9 +33,11 @@ TEST(SPSCRingBufferTest, EmptyAndFullStates) {
     EXPECT_FALSE(buffer.pop().has_value());
 
     EXPECT_TRUE(buffer.push(100));
-    EXPECT_FALSE(buffer.push(200));
+    EXPECT_TRUE(buffer.push(200));
+    EXPECT_FALSE(buffer.push(300));
 
     EXPECT_EQ(*buffer.pop(), 100);
+    EXPECT_EQ(*buffer.pop(), 200);
     EXPECT_FALSE(buffer.pop().has_value());
 }
 
@@ -58,7 +61,7 @@ TEST(SPSCRingBufferTest, ConcurrentSPSCStressTest) {
             while (!(val = buffer.pop())) std::this_thread::yield();
             received_data.push_back(*val);
         }
-    })
+    });
 
     producer.join();
     consumer.join();
