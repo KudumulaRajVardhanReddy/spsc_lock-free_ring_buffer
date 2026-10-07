@@ -9,7 +9,7 @@
 constexpr size_t kCapacity = 1024;
 
 //Benchmarks for Standard Mutex Queue
-static void BM_StandardMutexQueue(bench::State& state) {
+static void BM_StandardMutexQueue(benchmark::State& state) {
     StandardMutexQueue<size_t> queue;
     const size_t num_items = state.range(0);
 
@@ -37,7 +37,7 @@ static void BM_AtomicSPSCNoAlignas(benchmark::State& state) {
 
         std::thread producer([&]() {
             for (size_t i = 0; i < num_items; ++i) {
-                while (!buffer.push(i)) std::thread::yield();
+                while (!buffer.push(i)) std::this_thread::yield();
             }
         });
 
@@ -78,8 +78,8 @@ static void BM_SPSCRingBuffer(benchmark::State& state) {
     state.SetItemsProcessed(state.iterations() * num_items * 2);
 }
 
-BENCHMARK(BM_StandardMutexQueue)->Arg(1000000)->Unit(benchmark::kMilliseconds);
-BENCHMARK(BM_AtomicSPSCNoAlignas)->Arg(1000000)->Unit(benchmark::kMilliseconds);
-BENCHMARK(BM_SPSCRingBuffer)->Arg(1000000)->Unit(benchmark::kMilliseconds);
+BENCHMARK(BM_StandardMutexQueue)->Arg(1000000)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_AtomicSPSCNoAlignas)->Arg(1000000)->Unit(benchmark::kMillisecond);
+BENCHMARK(BM_SPSCRingBuffer)->Arg(1000000)->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();
