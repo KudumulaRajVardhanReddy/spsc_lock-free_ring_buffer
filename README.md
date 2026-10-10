@@ -87,3 +87,11 @@ Evaluated on x86_64 architecture using Google Benchmark (1,000,000 operations pe
    ```bash
    ./build/bench_comparison
    ```
+
+---
+
+## Future Development & Maintenance
+
+The ring buffer is currently implemented in C++17. I plan to maintain the project and progressively update the implementation to C++20 and C++23, incorporating newer language features and revisiting existing design choices as the project develops.
+
+Development will remain ongoing, with updates to the implementation, tests, and benchmarks as needed.
