@@ -1,6 +1,6 @@
-# High-Performance Lock-Free SPSC Ring Buffer
+# Lock-Free Single-Producer Single-Consumer Ring Buffer
 
-A header-only, high-performance **Single-Producer Single-Consumer (SPSC)** lock-free ring buffer implemented in C++.
+A **Single-Producer Single-Consumer (SPSC)** lock-free ring buffer implemented in C++.
 
 ---
 
