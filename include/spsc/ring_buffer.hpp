@@ -7,6 +7,16 @@
 #include <cstddef>
 #include <new>
 
+namespace spsc {
+    #ifdef __cpp_lib_hardware_interference_size
+        // If the compiler supports this C++ feature, pulls this.
+        using std::hardware_destructive_interference_size;
+    #else
+        // If the compiler doesn't support, it hardcodes 64 bytes cache-line size.
+        constexpr std::size_t hardware_destructive_interference_size = 64;
+    #endif
+}
+
 template<typename T, size_t Capacity>
 class SPSCRingBuffer {
     static_assert(((Capacity & (Capacity - 1)) == 0) && Capacity > 0, "Capacity must be a power of 2.");
@@ -43,7 +53,12 @@ public:
 private:
     static constexpr size_t kMask = Capacity - 1;
 
-    alignas(64) std::atomic<size_t> write_index_;
-    alignas(64) std::atomic<size_t> read_index_;
-    alignas(64) T buffer_[Capacity];
+    /*
+     Replacing hardcoded alignas(64) into alignas(spsc::hardware_destructive_interference_size)
+     former assumes target hardware has 64 bytes cache-line, the later dynamically finds out
+     the target hardware cache-line.
+     */
+    alignas(spsc::hardware_destructive_interference_size) std::atomic<size_t> write_index_;
+    alignas(spsc::hardware_destructive_interference_size) std::atomic<size_t> read_index_;
+    alignas(spsc::hardware_destructive_interference_size) T buffer_[Capacity];
 };
