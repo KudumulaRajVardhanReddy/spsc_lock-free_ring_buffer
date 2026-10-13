@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <optional>
 #include <atomic>
 #include <cstddef>
 
@@ -17,7 +16,7 @@ public:
         const size_t current_write = write_index_.load(std::memory_order_relaxed);
         const size_t current_read = read_index_.load(std::memory_order_acquire);
 
-        if (((current_write + 1) & kMask) == current_read) return false;
+        if (current_write - current_read >= Capacity) return false;
 
         buffer_[current_write & kMask] = item;
         write_index_.store(current_write + 1, std::memory_order_release);
@@ -25,20 +24,21 @@ public:
         return true;
     }
 
-    std::optional<T> pop() {
+    bool pop(T& item) {
         const size_t current_read = read_index_.load(std::memory_order_relaxed);
         const size_t current_write = write_index_.load(std::memory_order_acquire);
 
-        if (current_read == current_write) return std::nullopt;
+        if (current_read == current_write) return false;
 
-        T item = buffer_[current_read & kMask];
+        item = buffer_[current_read & kMask];
         read_index_.store(current_read + 1, std::memory_order_release);
 
-        return item;
+        return true;
     }
 
 private:
     static constexpr size_t kMask = Capacity - 1;
+
     T buffer_[Capacity];
     std::atomic<size_t> write_index_;
     std::atomic<size_t> read_index_;
