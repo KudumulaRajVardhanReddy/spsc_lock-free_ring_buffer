@@ -52,7 +52,9 @@ static void BM_StandardMutexQueue(benchmark::State& state) {
 
         std::thread producer([&]() {
             pin_thread_to_core(2);
-            for (size_t i = 0; i < num_items; ++i) queue.push(i);
+            for (size_t i = 0; i < num_items; ++i) {
+                while (!queue.push(i)) std::this_thread::yield();
+            }
         });
 
         std::thread consumer([&]() {
