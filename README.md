@@ -77,7 +77,7 @@ Evaluated under desynchronized processing conditions passing 1,000,000 data item
    ```
 
 ---
-## What I Changed from previous iteration
+## What I changed from the previous iteration
 
 I refactored the initial codebase to fix memory layout overhead, clear compilation bugs, and ensure the performance benchmarks are accurate and fair:
 
