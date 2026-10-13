@@ -16,29 +16,36 @@ TEST(SPSCRingBufferTest, SingleThreadBasicOps) {
 
     EXPECT_FALSE(buffer.push(50));
 
-    auto val1 = buffer.pop();
-    ASSERT_TRUE(val1.has_value());
-    EXPECT_EQ(*val1, 10);
+    int val1 = 0;
+    ASSERT_TRUE(buffer.pop(val1));
+    EXPECT_EQ(val1, 10);
 
     EXPECT_TRUE(buffer.push(50));
 
-    auto val2 = buffer.pop();
-    ASSERT_TRUE(val2.has_value());
-    EXPECT_EQ(*val2, 20);
+    int val2 = 0;
+    ASSERT_TRUE(buffer.pop(val2));
+    EXPECT_EQ(val2, 20);
 }
 
 TEST(SPSCRingBufferTest, EmptyAndFullStates) {
     SPSCRingBuffer<int, 2> buffer;
 
-    EXPECT_FALSE(buffer.pop().has_value());
+    int dummy = 0;
+    EXPECT_FALSE(buffer.pop(dummy));
 
     EXPECT_TRUE(buffer.push(100));
     EXPECT_TRUE(buffer.push(200));
     EXPECT_FALSE(buffer.push(300));
 
-    EXPECT_EQ(*buffer.pop(), 100);
-    EXPECT_EQ(*buffer.pop(), 200);
-    EXPECT_FALSE(buffer.pop().has_value());
+    int val1 = 0;
+    ASSERT_TRUE(buffer.pop(val1));
+    EXPECT_EQ(val1, 100);
+
+    int val2 = 0;
+    ASSERT_TRUE(buffer.pop(val2));
+    EXPECT_EQ(val2, 200);
+
+    EXPECT_FALSE(buffer.pop(dummy));
 }
 
 TEST(SPSCRingBufferTest, ConcurrentSPSCStressTest) {
@@ -56,10 +63,10 @@ TEST(SPSCRingBufferTest, ConcurrentSPSCStressTest) {
     });
 
     std::thread consumer([&]() {
+        size_t val = 0;
         for (size_t i = 0; i < kNumElements; ++i) {
-            std::optional<size_t> val;
-            while (!(val = buffer.pop())) std::this_thread::yield();
-            received_data.push_back(*val);
+            while (!buffer.pop(val)) std::this_thread::yield();
+            received_data.push_back(val);
         }
     });
 
