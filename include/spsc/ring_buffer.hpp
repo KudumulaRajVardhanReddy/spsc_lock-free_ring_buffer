@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include <atomic>
-#include <optional>
-#include <cstddef>
 #include <new>
+#include <atomic>
+//#include <optional>  // Dropping optional for preventing copy overhead and stack wrapping!!
+#include <cstddef>
 
 namespace spsc {
     #ifdef __cpp_lib_hardware_interference_size
@@ -24,6 +24,11 @@ class SPSCRingBuffer {
 public:
     SPSCRingBuffer() : write_index_(0), read_index_(0) {}
 
+    SPSCRingBuffer(const SPSCRingBuffer&) = delete;
+    SPSCRingBuffer& operator=(const SPSCRingBuffer&) = delete;
+    // disabling moving, copying avoids compiler mocing this object
+    // outside the cache-aligned memory boundary.
+
     bool push(const T& item) {
         const size_t current_write = write_index_.load(std::memory_order_relaxed);
         const size_t current_read = read_index_.load(std::memory_order_acquire);
@@ -36,6 +41,7 @@ public:
         return true;
     }
 
+    /*
     std::optional<T> pop() {
         const size_t current_read = read_index_.load(std::memory_order_relaxed);
         const size_t current_write = write_index_.load(std::memory_order_acquire);
@@ -46,6 +52,21 @@ public:
         read_index_.store(current_read + 1, std::memory_order_release);
 
         return item;
+    }
+
+    Replacing std::optional pop with Pass-by-Reference pop avoiding std::optional overhead
+    */
+
+    bool pop(T& item) {
+        const size_t current_read = read_index_.load(std::memory_order_relaxed);
+        const size_t current_write = write_index_.load(std::memory_order_acquire);
+
+        if (current_read == current_write) return false;
+
+        item = buffer_[current_read & kMask];
+        read_index_.store(current_read + 1, std::memory_order_release);
+
+        return true;
     }
 
     constexpr size_t capacity() const { return Capacity; }
