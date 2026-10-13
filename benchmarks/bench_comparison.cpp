@@ -57,7 +57,11 @@ static void BM_StandardMutexQueue(benchmark::State& state) {
 
         std::thread consumer([&]() {
             pin_thread_to_core(4);
-            for (size_t i = 0; i < num_items; ++i) queue.pop();
+
+            size_t item = 0;
+            for (size_t i = 0; i < num_items; ++i) {
+                while (!queue.pop(item)) std::this_thread::yield();
+            }
         });
 
         producer.join();
@@ -84,8 +88,10 @@ static void BM_AtomicSPSCNoAlignas(benchmark::State& state) {
 
         std::thread consumer([&]() {
             pin_thread_to_core(4);
+
+            size_t item = 0;
             for (size_t i = 0; i < num_items; ++i) {
-                while (!buffer.pop().has_value()) std::this_thread::yield();
+                while (!buffer.pop(item)) std::this_thread::yield();
             }
         });
 
