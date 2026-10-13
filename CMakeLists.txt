@@ -7,10 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(MSVC)
     add_compile_options(/O2 /arch:AVX2)
 else()
-    add_compile_options(-O3 -march=native -Wall -Wextra)
+    add_compile_options(-O3 -march=native -Wall -Wextra -Wno-interference-size)
 endif()
-
-include_directories(include benchmarks)
 
 include(FetchContent)
 
@@ -32,8 +30,12 @@ set(BENCHMARK_ENABLE_WERROR OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googlebenchmark)
 
 enable_testing()
+
 add_executable(test_ring_buffer tests/test_ring_buffer.cpp)
 target_link_libraries(test_ring_buffer PRIVATE gtest_main)
+target_include_directories(test_ring_buffer PRIVATE include benchmarks)
 
+# FIXED: Standardized target path to use the actual 'bench_comparison.cpp' filename
 add_executable(bench_comparison benchmarks/bench_comparison.cpp)
 target_link_libraries(bench_comparison PRIVATE benchmark::benchmark)
+target_include_directories(bench_comparison PRIVATE include benchmarks)
