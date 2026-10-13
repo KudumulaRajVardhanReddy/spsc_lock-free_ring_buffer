@@ -19,7 +19,7 @@
 #include "variants/atomic_spsc_no_alignas.hpp"
 #include "spsc/ring_buffer.hpp"
 
-constexpr size_t kCapacity = 1024;
+constexpr size_t kCapacity = 65536;
 
 inline void pin_thread_to_core(int core_or_tag) {
     #if defined(__linux__)
@@ -41,6 +41,11 @@ inline void pin_thread_to_core(int core_or_tag) {
     #endif
 }
 
+template <typename T>
+inline void do_not_optimize_workload(T&& val) {
+    benchmark::DoNotOptimize(val);
+}
+
 //Benchmarks for Standard Mutex Queue
 static void BM_StandardMutexQueue(benchmark::State& state) {
 
@@ -53,16 +58,19 @@ static void BM_StandardMutexQueue(benchmark::State& state) {
         std::thread producer([&]() {
             pin_thread_to_core(2);
             for (size_t i = 0; i < num_items; ++i) {
-                while (!queue.push(i)) std::this_thread::yield();
+                size_t work = i * 3;
+                do_not_optimize_workload(work);
+                while (!queue.push(work)) std::this_thread::yield();
             }
         });
 
         std::thread consumer([&]() {
             pin_thread_to_core(4);
-
             size_t item = 0;
             for (size_t i = 0; i < num_items; ++i) {
                 while (!queue.pop(item)) std::this_thread::yield();
+                size_t result = item + 5;
+                do_not_optimize_workload(result);
             }
         });
 
@@ -84,7 +92,9 @@ static void BM_AtomicSPSCNoAlignas(benchmark::State& state) {
         std::thread producer([&]() {
             pin_thread_to_core(2);
             for (size_t i = 0; i < num_items; ++i) {
-                while (!buffer.push(i)) std::this_thread::yield();
+                size_t work = i * 3;
+                do_not_optimize_workload(work);
+                while (!buffer.push(work)) std::this_thread::yield();
             }
         });
 
@@ -94,6 +104,8 @@ static void BM_AtomicSPSCNoAlignas(benchmark::State& state) {
             size_t item = 0;
             for (size_t i = 0; i < num_items; ++i) {
                 while (!buffer.pop(item)) std::this_thread::yield();
+                size_t result = item + 5;
+                do_not_optimize_workload(result);
             }
         });
 
@@ -115,7 +127,9 @@ static void BM_SPSCRingBuffer(benchmark::State& state) {
         std::thread producer([&]() {
             pin_thread_to_core(2);
             for (size_t i = 0; i < num_items; ++i) {
-                while (!buffer.push(i)) std::this_thread::yield();
+                size_t work = i * 3;
+                do_not_optimize_workload(work);
+                while (!buffer.push(work)) std::this_thread::yield();
             }
         });
 
@@ -125,6 +139,8 @@ static void BM_SPSCRingBuffer(benchmark::State& state) {
             size_t item = 0;
             for (size_t i = 0; i < num_items; ++i) {
                 while (!buffer.pop(item)) std::this_thread::yield();
+                size_t result = item + 5;
+                do_not_optimize_workload(result);
             }
         });
 
