@@ -1,35 +1,25 @@
 # Lock-Free Single-Producer Single-Consumer Ring Buffer
 
-A battle-tested, ultra-low-latency **Single-Producer Single-Consumer (SPSC)** lock-free ring buffer implemented in high-performance C++.
+A Single-Producer Single-Consumer (SPSC) lock-free ring buffer implemented in C++.
 
 ---
 
 ## Key Features
 
-* **Zero Lock Contention:** Completely lock-free operations utilizing fine-grained atomic operations with optimal Acquire-Release memory ordering semantics.
-* **Dynamic Hardware Cache Alignment:** Replaces hardcoded values with `alignas(spsc::hardware_destructive_interference_size)` to dynamically query the target architecture's cache line boundary, fully mitigating **False Sharing**.
-* **Zero-Allocation Hot Paths:** Upgraded to an ultra-fast pass-by-reference signature (`bool pop(T& item)`), completely eliminating `std::optional` structural wrapping, copy overheads, and stack memory padding footprints.
-* **Bounded Power-of-Two Capacity:** Enforces strict power-of-two capacity validation at compile time, enabling high-speed bitwise masking (`index & kMask`) for O(1) routing, entirely avoiding expensive integer modulo (`%`) instructions.
-* **Compile-Time Shields:** Explicitly deletes copy constructors and assignment operators (`= delete`) at the compiler phase to prevent layout shifts or accidental object slicing in thread contexts.
+* **Lock-Free Execution:** Implemented using fine-grained atomic operations with Acquire-Release memory ordering semantics to eliminate thread synchronization locks.
+* **Hardware-Driven Cache Alignment:** Uses `alignas(spsc::hardware_destructive_interference_size)` to query and match the compilation target's physical cache line boundaries, preventing false sharing.
+* **Zero-Allocation hot paths:** Employs a pass-by-reference signature (`bool pop(T& item)`), removing the stack allocation, copy wrapping, and structural data padding introduced by `std::optional`.
+* **Power-of-Two Capacity Validation:** Enforces strict power-of-two capacities via compile-time constraints (`static_assert`), enabling bitwise AND masking (`index & kMask`) for O(1) array lookups instead of integer modulo (`%`) math.
+* **Compile-Time Safeties:** Explicitly marks copy constructors and assignment operators as deleted (`= delete`) to block accidental layout duplication or object slicing across runtime boundaries.
 
 ---
 
 ## Technical Architecture
 
 ### Memory Order & Synchronization
-* **Producer (`push`):** Loads the trailing consumer position using `std::memory_order_acquire` and publishes updates using `std::memory_order_release`.
-* **Consumer (`pop`):** Reads the advancing producer position using `std::memory_order_acquire` and releases ownership updates via `std::memory_order_release`.
+* **Producer (`push`):** Reads the current consumer position with `std::memory_order_acquire` and writes to the published index using `std::memory_order_release`.
+* **Consumer (`pop`):** Reads the current producer position with `std::memory_order_acquire` and updates its index via `std::memory_order_release`.
 
-### Cache Line Layout
-To achieve absolute mechanical sympathy, the internal memory sequence enforces strict compilation placement boundaries to isolate active thread pipelines onto distinct hardware cache lines:
-
-+-------------------------------------------------------------+
-| write_index_ (Producer)  | Dynamic Cache Padding            | -> Cache Line 0
-+-------------------------------------------------------------+
-| read_index_  (Consumer)  | Dynamic Cache Padding            | -> Cache Line 1
-+-------------------------------------------------------------+
-| T buffer_[Capacity]      | Core Storage Memory Blocks       | -> Cache Line 2+
-+-------------------------------------------------------------+
 ---
 
 ## Performance Benchmarks
@@ -87,7 +77,6 @@ Evaluated under desynchronized processing conditions passing 1,000,000 data item
    ```
 
 ---
-
 ## What I Changed from previous iteration
 
 I refactored the initial codebase to fix memory layout overhead, clear compilation bugs, and ensure the performance benchmarks are accurate and fair:
