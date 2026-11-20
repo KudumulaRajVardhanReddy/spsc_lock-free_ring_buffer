@@ -52,7 +52,7 @@ Evaluated under desynchronized processing conditions passing 1,000,000 data item
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/KudumulaRajVardhanReddy/spsc_lock-free_ring_buffer.git]
+   git clone https://github.com/KudumulaRajVardhanReddy/spsc_lock-free_ring_buffer.git
    cd spsc_lock-free_ring_buffer
    ```
 
